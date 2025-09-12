@@ -128,21 +128,12 @@ export const OPT_TRANS_BAIDU = "Baidu";
 export const OPT_TRANS_TENCENT = "Tencent";
 export const OPT_TRANS_VOLCENGINE = "Volcengine";
 export const OPT_TRANS_OPENAI = "OpenAI";
-export const OPT_TRANS_OPENAI_2 = "OpenAI2";
-export const OPT_TRANS_OPENAI_3 = "OpenAI3";
 export const OPT_TRANS_GEMINI = "Gemini";
-export const OPT_TRANS_GEMINI_2 = "Gemini2";
 export const OPT_TRANS_CLAUDE = "Claude";
 export const OPT_TRANS_CLOUDFLAREAI = "CloudflareAI";
 export const OPT_TRANS_OLLAMA = "Ollama";
-export const OPT_TRANS_OLLAMA_2 = "Ollama2";
-export const OPT_TRANS_OLLAMA_3 = "Ollama3";
 export const OPT_TRANS_OPENROUTER = "OpenRouter";
 export const OPT_TRANS_CUSTOMIZE = "Custom";
-export const OPT_TRANS_CUSTOMIZE_2 = "Custom2";
-export const OPT_TRANS_CUSTOMIZE_3 = "Custom3";
-export const OPT_TRANS_CUSTOMIZE_4 = "Custom4";
-export const OPT_TRANS_CUSTOMIZE_5 = "Custom5";
 export const OPT_TRANS_ALL = [
   OPT_TRANS_GOOGLE,
   OPT_TRANS_GOOGLE_2,
@@ -155,21 +146,12 @@ export const OPT_TRANS_ALL = [
   OPT_TRANS_DEEPLX,
   OPT_TRANS_NIUTRANS,
   OPT_TRANS_OPENAI,
-  OPT_TRANS_OPENAI_2,
-  OPT_TRANS_OPENAI_3,
   OPT_TRANS_GEMINI,
-  OPT_TRANS_GEMINI_2,
   OPT_TRANS_CLAUDE,
   OPT_TRANS_CLOUDFLAREAI,
   OPT_TRANS_OLLAMA,
-  OPT_TRANS_OLLAMA_2,
-  OPT_TRANS_OLLAMA_3,
   OPT_TRANS_OPENROUTER,
   OPT_TRANS_CUSTOMIZE,
-  OPT_TRANS_CUSTOMIZE_2,
-  OPT_TRANS_CUSTOMIZE_3,
-  OPT_TRANS_CUSTOMIZE_4,
-  OPT_TRANS_CUSTOMIZE_5,
 ];
 
 export const OPT_LANGDETECTOR_ALL = [
@@ -310,28 +292,13 @@ export const OPT_LANGS_SPECIAL = {
   [OPT_TRANS_OPENAI]: new Map(
     OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
   ),
-  [OPT_TRANS_OPENAI_2]: new Map(
-    OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
-  ),
-  [OPT_TRANS_OPENAI_3]: new Map(
-    OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
-  ),
   [OPT_TRANS_GEMINI]: new Map(
-    OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
-  ),
-  [OPT_TRANS_GEMINI_2]: new Map(
     OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
   ),
   [OPT_TRANS_CLAUDE]: new Map(
     OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
   ),
   [OPT_TRANS_OLLAMA]: new Map(
-    OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
-  ),
-  [OPT_TRANS_OLLAMA_2]: new Map(
-    OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
-  ),
-  [OPT_TRANS_OLLAMA_3]: new Map(
     OPT_LANGS_FROM.map(([key, val]) => [key, val.split(" - ")[0]])
   ),
   [OPT_TRANS_OPENROUTER]: new Map(
@@ -352,22 +319,6 @@ export const OPT_LANGS_SPECIAL = {
     ["hi", "hindi"],
   ]),
   [OPT_TRANS_CUSTOMIZE]: new Map([
-    ...OPT_LANGS_FROM.map(([key]) => [key, key]),
-    ["auto", ""],
-  ]),
-  [OPT_TRANS_CUSTOMIZE_2]: new Map([
-    ...OPT_LANGS_FROM.map(([key]) => [key, key]),
-    ["auto", ""],
-  ]),
-  [OPT_TRANS_CUSTOMIZE_3]: new Map([
-    ...OPT_LANGS_FROM.map(([key]) => [key, key]),
-    ["auto", ""],
-  ]),
-  [OPT_TRANS_CUSTOMIZE_4]: new Map([
-    ...OPT_LANGS_FROM.map(([key]) => [key, key]),
-    ["auto", ""],
-  ]),
-  [OPT_TRANS_CUSTOMIZE_5]: new Map([
     ...OPT_LANGS_FROM.map(([key]) => [key, key]),
     ["auto", ""],
   ]),
@@ -683,8 +634,6 @@ export const DEFAULT_TRANS_APIS = {
     httpTimeout: DEFAULT_HTTP_TIMEOUT,
   },
   [OPT_TRANS_OPENAI]: defaultOpenaiApi,
-  [OPT_TRANS_OPENAI_2]: defaultOpenaiApi,
-  [OPT_TRANS_OPENAI_3]: defaultOpenaiApi,
   [OPT_TRANS_GEMINI]: {
     url: `https://generativelanguage.googleapis.com/v1/models/${INPUT_PLACE_MODEL}:generateContent?key=${INPUT_PLACE_KEY}`,
     key: "",
@@ -698,22 +647,6 @@ export const DEFAULT_TRANS_APIS = {
     fetchLimit: 1,
     fetchInterval: 500,
     apiName: OPT_TRANS_GEMINI,
-    isDisabled: false,
-    httpTimeout: DEFAULT_HTTP_TIMEOUT * 2,
-  },
-  [OPT_TRANS_GEMINI_2]: {
-    url: `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`,
-    key: "",
-    model: "gemini-2.0-flash",
-    systemPrompt: `You are a professional, authentic machine translation engine.`,
-    userPrompt: `Translate the following source text from ${INPUT_PLACE_FROM} to ${INPUT_PLACE_TO}. Output translation directly without any additional text.\n\nSource Text: ${INPUT_PLACE_TEXT}\n\nTranslated Text:`,
-    customHeader: "",
-    customBody: "",
-    temperature: 0,
-    maxTokens: 2048,
-    fetchLimit: 1,
-    fetchInterval: 500,
-    apiName: OPT_TRANS_GEMINI_2,
     isDisabled: false,
     httpTimeout: DEFAULT_HTTP_TIMEOUT * 2,
   },
@@ -743,8 +676,6 @@ export const DEFAULT_TRANS_APIS = {
     httpTimeout: DEFAULT_HTTP_TIMEOUT * 2,
   },
   [OPT_TRANS_OLLAMA]: defaultOllamaApi,
-  [OPT_TRANS_OLLAMA_2]: defaultOllamaApi,
-  [OPT_TRANS_OLLAMA_3]: defaultOllamaApi,
   [OPT_TRANS_OPENROUTER]: {
     url: "https://openrouter.ai/api/v1/chat/completions",
     key: "",
@@ -762,10 +693,6 @@ export const DEFAULT_TRANS_APIS = {
     httpTimeout: DEFAULT_HTTP_TIMEOUT * 2,
   },
   [OPT_TRANS_CUSTOMIZE]: defaultCustomApi,
-  [OPT_TRANS_CUSTOMIZE_2]: defaultCustomApi,
-  [OPT_TRANS_CUSTOMIZE_3]: defaultCustomApi,
-  [OPT_TRANS_CUSTOMIZE_4]: defaultCustomApi,
-  [OPT_TRANS_CUSTOMIZE_5]: defaultCustomApi,
 };
 
 // 默认快捷键

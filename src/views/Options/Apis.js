@@ -15,21 +15,12 @@ import {
   OPT_TRANS_TENCENT,
   OPT_TRANS_VOLCENGINE,
   OPT_TRANS_OPENAI,
-  OPT_TRANS_OPENAI_2,
-  OPT_TRANS_OPENAI_3,
   OPT_TRANS_GEMINI,
-  OPT_TRANS_GEMINI_2,
   OPT_TRANS_CLAUDE,
   OPT_TRANS_CLOUDFLAREAI,
   OPT_TRANS_OLLAMA,
-  OPT_TRANS_OLLAMA_2,
-  OPT_TRANS_OLLAMA_3,
   OPT_TRANS_OPENROUTER,
   OPT_TRANS_CUSTOMIZE,
-  OPT_TRANS_CUSTOMIZE_2,
-  OPT_TRANS_CUSTOMIZE_3,
-  OPT_TRANS_CUSTOMIZE_4,
-  OPT_TRANS_CUSTOMIZE_5,
   OPT_TRANS_NIUTRANS,
   URL_NIUTRANS_REG,
   DEFAULT_FETCH_LIMIT,
@@ -187,22 +178,13 @@ function ApiFields({ translator, api, updateApi, resetApi }) {
   const mulkeysTranslators = [
     OPT_TRANS_DEEPL,
     OPT_TRANS_OPENAI,
-    OPT_TRANS_OPENAI_2,
-    OPT_TRANS_OPENAI_3,
     OPT_TRANS_GEMINI,
-    OPT_TRANS_GEMINI_2,
     OPT_TRANS_CLAUDE,
     OPT_TRANS_CLOUDFLAREAI,
     OPT_TRANS_OLLAMA,
-    OPT_TRANS_OLLAMA_2,
-    OPT_TRANS_OLLAMA_3,
     OPT_TRANS_OPENROUTER,
     OPT_TRANS_NIUTRANS,
     OPT_TRANS_CUSTOMIZE,
-    OPT_TRANS_CUSTOMIZE_2,
-    OPT_TRANS_CUSTOMIZE_3,
-    OPT_TRANS_CUSTOMIZE_4,
-    OPT_TRANS_CUSTOMIZE_5,
   ];
 
   const keyHelper =
@@ -256,11 +238,11 @@ function ApiFields({ translator, api, updateApi, resetApi }) {
         </>
       )}
 
-      {(translator.startsWith(OPT_TRANS_OPENAI) ||
-        translator.startsWith(OPT_TRANS_OLLAMA) ||
+      {(translator === OPT_TRANS_OPENAI ||
+        translator === OPT_TRANS_OLLAMA ||
         translator === OPT_TRANS_CLAUDE ||
         translator === OPT_TRANS_OPENROUTER ||
-        translator.startsWith(OPT_TRANS_GEMINI)) && (
+        translator === OPT_TRANS_GEMINI) && (
         <>
           <TextField
             size="small"
@@ -310,7 +292,7 @@ function ApiFields({ translator, api, updateApi, resetApi }) {
         </>
       )}
 
-      {translator.startsWith(OPT_TRANS_OLLAMA) && (
+      {translator === OPT_TRANS_OLLAMA && (
         <>
           <TextField
             select
@@ -333,11 +315,10 @@ function ApiFields({ translator, api, updateApi, resetApi }) {
         </>
       )}
 
-      {(translator.startsWith(OPT_TRANS_OPENAI) ||
+      {(translator === OPT_TRANS_OPENAI ||
         translator === OPT_TRANS_CLAUDE ||
         translator === OPT_TRANS_OPENROUTER ||
-        translator === OPT_TRANS_GEMINI ||
-        translator === OPT_TRANS_GEMINI_2) && (
+        translator === OPT_TRANS_GEMINI) && (
         <>
           <TextField
             size="small"
@@ -377,7 +358,7 @@ function ApiFields({ translator, api, updateApi, resetApi }) {
         </>
       )}
 
-      {translator.startsWith(OPT_TRANS_CUSTOMIZE) && (
+      {translator === OPT_TRANS_CUSTOMIZE && (
         <>
           <TextField
             size="small"
@@ -454,7 +435,7 @@ function ApiFields({ translator, api, updateApi, resetApi }) {
         </Button>
       </Stack>
 
-      {translator.startsWith(OPT_TRANS_CUSTOMIZE) && (
+      {translator === OPT_TRANS_CUSTOMIZE && (
         <pre>{i18n("custom_api_help")}</pre>
       )}
     </Stack>
@@ -490,7 +471,7 @@ function ApiAccordion({ translator }) {
   );
 }
 
-function ApiAccordionWithRemove({ translator, onRemove }) {
+function ApiAccordionWithRemove({ translator, baseType, onRemove }) {
   const [expanded, setExpanded] = useState(false);
   const { api, updateApi, resetApi } = useApi(translator);
 
@@ -508,7 +489,7 @@ function ApiAccordionWithRemove({ translator, onRemove }) {
           width="100%"
         >
           <Typography>
-            {api.apiName ? `${translator} (${api.apiName})` : translator}
+            {api.apiName ? `${baseType} (${api.apiName})` : baseType}
           </Typography>
           <IconButton
             size="small"
@@ -524,7 +505,7 @@ function ApiAccordionWithRemove({ translator, onRemove }) {
       <AccordionDetails>
         {expanded && (
           <ApiFields
-            translator={translator}
+            translator={baseType}
             api={api}
             updateApi={updateApi}
             resetApi={resetApi}
@@ -556,9 +537,11 @@ export default function Apis() {
   // 初始化已添加的API列表
   useEffect(() => {
     const transApis = setting?.transApis || {};
+    // 只显示用户明确添加的API（带有时间戳的）
     const configuredApis = Object.keys(transApis).filter(
       (translator) =>
         !builtinTranslators.includes(translator) &&
+        translator.includes("_") && // 只显示带有时间戳的API，即用户明确添加的
         (transApis[translator].url ||
           transApis[translator].key ||
           transApis[translator].apiName)
@@ -567,14 +550,48 @@ export default function Apis() {
   }, [setting]);
 
   const handleAddApi = () => {
-    if (selectedApi && !addedApis.includes(selectedApi)) {
-      setAddedApis([...addedApis, selectedApi]);
+    if (selectedApi) {
+      // 为新API生成唯一标识符
+      const newApiId = `${selectedApi}_${Date.now()}`;
+      setAddedApis([...addedApis, newApiId]);
+
+      // 初始化新API的配置
+      const defaultConfig = setting?.transApis?.[selectedApi] || {};
+      updateSetting({
+        transApis: {
+          ...setting?.transApis,
+          [newApiId]: {
+            ...defaultConfig,
+            apiName: `${selectedApi} ${addedApis.filter((api) => api.startsWith(selectedApi)).length + 1}`,
+          },
+        },
+      });
+
       setSelectedApi("");
     }
   };
 
   const handleRemoveApi = (translator) => {
     setAddedApis(addedApis.filter((api) => api !== translator));
+
+    // 从设置中移除API配置
+    const newTransApis = { ...setting?.transApis };
+    delete newTransApis[translator];
+    updateSetting({ transApis: newTransApis });
+  };
+
+  // 获取API的基础类型（去除时间戳）
+  const getApiBaseType = (apiId) => {
+    return apiId.replace(/_\d+$/, "");
+  };
+
+  // 获取未添加的API列表
+  const getUnaddedApis = () => {
+    // 获取已添加的API类型（去除时间戳）
+    const addedApiTypes = addedApis.map((api) => api.replace(/_\d+$/, ""));
+    return availableApis.filter(
+      (translator) => !addedApiTypes.includes(translator)
+    );
   };
 
   return (
@@ -605,13 +622,12 @@ export default function Apis() {
                 label={i18n("select_api")}
                 onChange={(e) => setSelectedApi(e.target.value)}
               >
-                {availableApis
-                  .filter((api) => !addedApis.includes(api))
-                  .map((translator) => (
-                    <MenuItem key={translator} value={translator}>
-                      {translator}
-                    </MenuItem>
-                  ))}
+                <MenuItem value="">{i18n("add_translation_api")}</MenuItem>
+                {getUnaddedApis().map((translator) => (
+                  <MenuItem key={translator} value={translator}>
+                    {translator}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <IconButton
@@ -635,6 +651,7 @@ export default function Apis() {
                 <ApiAccordionWithRemove
                   key={translator}
                   translator={translator}
+                  baseType={getApiBaseType(translator)}
                   onRemove={handleRemoveApi}
                 />
               ))}

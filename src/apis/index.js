@@ -215,10 +215,17 @@ export const apiTranslate = async ({
     return ["", false];
   }
 
+  // 获取API的基础类型（去除时间戳）
+  const getApiBaseType = (apiId) => {
+    return apiId.replace(/_\d+$/, "");
+  };
+
+  const baseType = getApiBaseType(translator);
+
   const from =
-    OPT_LANGS_SPECIAL[translator].get(fromLang) ??
-    OPT_LANGS_SPECIAL[translator].get("auto");
-  const to = OPT_LANGS_SPECIAL[translator].get(toLang);
+    OPT_LANGS_SPECIAL[baseType].get(fromLang) ??
+    OPT_LANGS_SPECIAL[baseType].get("auto");
+  const to = OPT_LANGS_SPECIAL[baseType].get(toLang);
   if (!to) {
     kissLog(`target lang: ${toLang} not support`, "translate");
     return ["", false];
@@ -243,7 +250,7 @@ export const apiTranslate = async ({
 
   // 请求接口数据
   if (!resCache) {
-    const [input, init] = await genTransReq(translator, {
+    const [input, init] = await genTransReq(baseType, {
       text,
       from,
       to,
@@ -265,7 +272,7 @@ export const apiTranslate = async ({
   }
 
   // 解析返回数据
-  const [trText, isSame] = parseTransRes(translator, res, apiSetting, {
+  const [trText, isSame] = parseTransRes(baseType, res, apiSetting, {
     text,
     from,
     to,

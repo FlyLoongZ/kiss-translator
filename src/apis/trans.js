@@ -11,21 +11,12 @@ import {
   OPT_TRANS_TENCENT,
   OPT_TRANS_VOLCENGINE,
   OPT_TRANS_OPENAI,
-  OPT_TRANS_OPENAI_2,
-  OPT_TRANS_OPENAI_3,
   OPT_TRANS_GEMINI,
-  OPT_TRANS_GEMINI_2,
   OPT_TRANS_CLAUDE,
   OPT_TRANS_CLOUDFLAREAI,
   OPT_TRANS_OLLAMA,
-  OPT_TRANS_OLLAMA_2,
-  OPT_TRANS_OLLAMA_3,
   OPT_TRANS_OPENROUTER,
   OPT_TRANS_CUSTOMIZE,
-  OPT_TRANS_CUSTOMIZE_2,
-  OPT_TRANS_CUSTOMIZE_3,
-  OPT_TRANS_CUSTOMIZE_4,
-  OPT_TRANS_CUSTOMIZE_5,
   URL_MICROSOFT_TRAN,
   URL_TENCENT_TRANSMART,
   URL_VOLCENGINE_TRAN,
@@ -39,6 +30,7 @@ import {
 import { msAuth } from "../libs/auth";
 import { genDeeplFree } from "./deepl";
 import { genBaidu } from "./baidu";
+import { genAIModel, parseAIModelResponse } from "./ai";
 import interpreter from "../libs/interpreter";
 import { parseJsonObj } from "../libs/utils";
 
@@ -231,346 +223,6 @@ const genVolcengine = ({ text, from, to }) => {
   return [URL_VOLCENGINE_TRAN, init];
 };
 
-const genOpenAI = ({
-  text,
-  from,
-  to,
-  url,
-  key,
-  systemPrompt,
-  userPrompt,
-  model,
-  temperature,
-  maxTokens,
-  customHeader,
-  customBody,
-}) => {
-  // 兼容历史上作为systemPrompt的prompt，如果prompt中不包含带翻译文本，则添加文本到prompt末尾
-  // if (!prompt.includes(INPUT_PLACE_TEXT)) {
-  //   prompt += `\nSource Text: ${INPUT_PLACE_TEXT}`;
-  // }
-  systemPrompt = systemPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-  userPrompt = userPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-
-  // TODO: 同时支持json对象和hook函数
-  customHeader = parseJsonObj(customHeader);
-  customBody = parseJsonObj(customBody);
-
-  const data = {
-    model,
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: userPrompt,
-      },
-    ],
-    temperature,
-    max_completion_tokens: maxTokens,
-    ...customBody,
-  };
-
-  const init = {
-    headers: {
-      "Content-type": "application/json",
-      Authorization: `Bearer ${key}`, // OpenAI
-      "api-key": key, // Azure OpenAI
-      ...customHeader,
-    },
-    method: "POST",
-    body: JSON.stringify(data),
-  };
-
-  return [url, init];
-};
-
-const genGemini = ({
-  text,
-  from,
-  to,
-  url,
-  key,
-  systemPrompt,
-  userPrompt,
-  model,
-  temperature,
-  maxTokens,
-  customHeader,
-  customBody,
-}) => {
-  url = url
-    .replaceAll(INPUT_PLACE_MODEL, model)
-    .replaceAll(INPUT_PLACE_KEY, key);
-  systemPrompt = systemPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-  userPrompt = userPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-
-  customHeader = parseJsonObj(customHeader);
-  customBody = parseJsonObj(customBody);
-
-  const data = {
-    system_instruction: {
-      parts: {
-        text: systemPrompt,
-      },
-    },
-    contents: {
-      role: "user",
-      parts: {
-        text: userPrompt,
-      },
-    },
-    generationConfig: {
-      maxOutputTokens: maxTokens,
-      temperature,
-      // topP: 0.8,
-      // topK: 10,
-    },
-    ...customBody,
-  };
-
-  const init = {
-    headers: {
-      "Content-type": "application/json",
-      ...customHeader,
-    },
-    method: "POST",
-    body: JSON.stringify(data),
-  };
-
-  return [url, init];
-};
-
-const genGemini2 = ({
-  text,
-  from,
-  to,
-  url,
-  key,
-  systemPrompt,
-  userPrompt,
-  model,
-  temperature,
-  maxTokens,
-  customHeader,
-  customBody,
-}) => {
-  systemPrompt = systemPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-  userPrompt = userPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-
-  customHeader = parseJsonObj(customHeader);
-  customBody = parseJsonObj(customBody);
-
-  const data = {
-    model,
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: userPrompt,
-      },
-    ],
-    temperature,
-    max_tokens: maxTokens,
-    ...customBody,
-  };
-
-  const init = {
-    headers: {
-      "Content-type": "application/json",
-      Authorization: `Bearer ${key}`,
-      ...customHeader,
-    },
-    method: "POST",
-    body: JSON.stringify(data),
-  };
-
-  return [url, init];
-};
-
-const genClaude = ({
-  text,
-  from,
-  to,
-  url,
-  key,
-  systemPrompt,
-  userPrompt,
-  model,
-  temperature,
-  maxTokens,
-  customHeader,
-  customBody,
-}) => {
-  systemPrompt = systemPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-  userPrompt = userPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-
-  customHeader = parseJsonObj(customHeader);
-  customBody = parseJsonObj(customBody);
-
-  const data = {
-    model,
-    system: systemPrompt,
-    messages: [
-      {
-        role: "user",
-        content: userPrompt,
-      },
-    ],
-    temperature,
-    max_tokens: maxTokens,
-    ...customBody,
-  };
-
-  const init = {
-    headers: {
-      "Content-type": "application/json",
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-      "x-api-key": key,
-      ...customHeader,
-    },
-    method: "POST",
-    body: JSON.stringify(data),
-  };
-
-  return [url, init];
-};
-
-const genOpenRouter = ({
-  text,
-  from,
-  to,
-  url,
-  key,
-  systemPrompt,
-  userPrompt,
-  model,
-  temperature,
-  maxTokens,
-  customHeader,
-  customBody,
-}) => {
-  systemPrompt = systemPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-  userPrompt = userPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-
-  customHeader = parseJsonObj(customHeader);
-  customBody = parseJsonObj(customBody);
-
-  const data = {
-    model,
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: userPrompt,
-      },
-    ],
-    temperature,
-    max_tokens: maxTokens,
-    ...customBody,
-  };
-
-  const init = {
-    headers: {
-      "Content-type": "application/json",
-      Authorization: `Bearer ${key}`,
-      ...customHeader,
-    },
-    method: "POST",
-    body: JSON.stringify(data),
-  };
-
-  return [url, init];
-};
-
-const genOllama = ({
-  text,
-  from,
-  to,
-  think,
-  url,
-  key,
-  systemPrompt,
-  userPrompt,
-  model,
-  customHeader,
-  customBody,
-}) => {
-  systemPrompt = systemPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-  userPrompt = userPrompt
-    .replaceAll(INPUT_PLACE_FROM, from)
-    .replaceAll(INPUT_PLACE_TO, to)
-    .replaceAll(INPUT_PLACE_TEXT, text);
-
-  customHeader = parseJsonObj(customHeader);
-  customBody = parseJsonObj(customBody);
-
-  const data = {
-    model,
-    system: systemPrompt,
-    prompt: userPrompt,
-    think: think,
-    stream: false,
-    ...customBody,
-  };
-
-  const init = {
-    headers: {
-      "Content-type": "application/json",
-      ...customHeader,
-    },
-    method: "POST",
-    body: JSON.stringify(data),
-  };
-  if (key) {
-    init.headers.Authorization = `Bearer ${key}`;
-  }
-
-  return [url, init];
-};
-
 const genCloudflareAI = ({ text, from, to, url, key }) => {
   const data = {
     text,
@@ -633,22 +285,13 @@ export const genTransReq = (translator, args) => {
   switch (translator) {
     case OPT_TRANS_DEEPL:
     case OPT_TRANS_OPENAI:
-    case OPT_TRANS_OPENAI_2:
-    case OPT_TRANS_OPENAI_3:
     case OPT_TRANS_GEMINI:
-    case OPT_TRANS_GEMINI_2:
     case OPT_TRANS_CLAUDE:
     case OPT_TRANS_CLOUDFLAREAI:
     case OPT_TRANS_OLLAMA:
-    case OPT_TRANS_OLLAMA_2:
-    case OPT_TRANS_OLLAMA_3:
     case OPT_TRANS_OPENROUTER:
     case OPT_TRANS_NIUTRANS:
     case OPT_TRANS_CUSTOMIZE:
-    case OPT_TRANS_CUSTOMIZE_2:
-    case OPT_TRANS_CUSTOMIZE_3:
-    case OPT_TRANS_CUSTOMIZE_4:
-    case OPT_TRANS_CUSTOMIZE_5:
       args.key = keyPick(translator, args.key, keyMap);
       break;
     case OPT_TRANS_DEEPLX:
@@ -679,28 +322,18 @@ export const genTransReq = (translator, args) => {
     case OPT_TRANS_VOLCENGINE:
       return genVolcengine(args);
     case OPT_TRANS_OPENAI:
-    case OPT_TRANS_OPENAI_2:
-    case OPT_TRANS_OPENAI_3:
-      return genOpenAI(args);
+      return genAIModel({ ...args, provider: "openai" });
     case OPT_TRANS_GEMINI:
-      return genGemini(args);
-    case OPT_TRANS_GEMINI_2:
-      return genGemini2(args);
+      return genAIModel({ ...args, provider: "gemini" });
     case OPT_TRANS_CLAUDE:
-      return genClaude(args);
+      return genAIModel({ ...args, provider: "claude" });
     case OPT_TRANS_CLOUDFLAREAI:
       return genCloudflareAI(args);
     case OPT_TRANS_OLLAMA:
-    case OPT_TRANS_OLLAMA_2:
-    case OPT_TRANS_OLLAMA_3:
-      return genOllama(args);
+      return genAIModel({ ...args, provider: "ollama" });
     case OPT_TRANS_OPENROUTER:
-      return genOpenRouter(args);
+      return genAIModel({ ...args, provider: "openrouter" });
     case OPT_TRANS_CUSTOMIZE:
-    case OPT_TRANS_CUSTOMIZE_2:
-    case OPT_TRANS_CUSTOMIZE_3:
-    case OPT_TRANS_CUSTOMIZE_4:
-    case OPT_TRANS_CUSTOMIZE_5:
       return genCustom(args);
     default:
       throw new Error(`[trans] translator: ${translator} not support`);
@@ -779,30 +412,20 @@ export const parseTransRes = (
       isSame = to === res?.detected_language;
       break;
     case OPT_TRANS_OPENAI:
-    case OPT_TRANS_OPENAI_2:
-    case OPT_TRANS_OPENAI_3:
-    case OPT_TRANS_GEMINI_2:
     case OPT_TRANS_OPENROUTER:
-      trText = res?.choices?.map((item) => item.message.content).join(" ");
-      isSame = text === trText;
+      [trText, isSame] = parseAIModelResponse(res, "openai");
       break;
     case OPT_TRANS_GEMINI:
-      trText = res?.candidates
-        ?.map((item) => item.content?.parts.map((item) => item.text).join(" "))
-        .join(" ");
-      isSame = text === trText;
+      [trText, isSame] = parseAIModelResponse(res, "gemini");
       break;
     case OPT_TRANS_CLAUDE:
-      trText = res?.content?.map((item) => item.text).join(" ");
-      isSame = text === trText;
+      [trText, isSame] = parseAIModelResponse(res, "claude");
       break;
     case OPT_TRANS_CLOUDFLAREAI:
       trText = res?.result?.translated_text;
       isSame = text === trText;
       break;
     case OPT_TRANS_OLLAMA:
-    case OPT_TRANS_OLLAMA_2:
-    case OPT_TRANS_OLLAMA_3:
       const { thinkIgnore = "" } = apiSetting;
       const deepModels = thinkIgnore.split(",").filter((model) => model.trim());
       if (deepModels.some((model) => res?.model?.startsWith(model))) {
@@ -813,10 +436,6 @@ export const parseTransRes = (
       isSame = text === trText;
       break;
     case OPT_TRANS_CUSTOMIZE:
-    case OPT_TRANS_CUSTOMIZE_2:
-    case OPT_TRANS_CUSTOMIZE_3:
-    case OPT_TRANS_CUSTOMIZE_4:
-    case OPT_TRANS_CUSTOMIZE_5:
       const { resHook } = apiSetting;
       if (resHook?.trim()) {
         interpreter.run(`exports.resHook = ${resHook}`);
