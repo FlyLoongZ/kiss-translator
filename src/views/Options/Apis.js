@@ -457,13 +457,15 @@ function ApiAccordion({ translator }) {
     <Accordion expanded={expanded} onChange={handleChange}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>
-          {api.apiName ? `${translator} (${api.apiName})` : translator}
+          {api.apiName
+            ? `${translator} (${api.apiName})`
+            : translator}
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
         {expanded && (
           <ApiFields
-            translator={translator}
+            translator={translator.replace(/_\d+$/, "")}
             api={api}
             updateApi={updateApi}
             resetApi={resetApi}
@@ -659,16 +661,14 @@ export default function Apis() {
             <Typography variant="h6" gutterBottom>
               {i18n("added_apis")}
             </Typography>
-            <Stack spacing={1}>
-              {addedApis.map((translator) => (
-                <ApiAccordionWithRemove
-                  key={translator}
-                  translator={translator}
-                  baseType={getApiBaseType(translator)}
-                  onRemove={handleRemoveApi}
-                />
-              ))}
-            </Stack>
+            {addedApis.map((translator) => (
+              <ApiAccordionWithRemove
+                key={translator}
+                translator={translator}
+                baseType={getApiBaseType(translator)}
+                onRemove={handleRemoveApi}
+              />
+            ))}
           </Box>
         )}
       </Stack>
