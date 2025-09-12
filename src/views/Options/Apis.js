@@ -118,7 +118,7 @@ function TestButton({ translator, api }) {
   );
 }
 
-function ApiFields({ translator, api, updateApi, resetApi }) {
+function ApiFields({ translator, api, updateApi, resetApi, onRemove }) {
   const i18n = useI18n();
   const {
     url = "",
@@ -436,6 +436,16 @@ function ApiFields({ translator, api, updateApi, resetApi }) {
         >
           {i18n("restore_default")}
         </Button>
+        {onRemove && (
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            onClick={onRemove}
+          >
+            {i18n("remove")}
+          </Button>
+        )}
       </Stack>
 
       {translator === OPT_TRANS_CUSTOMIZE && (
@@ -457,9 +467,7 @@ function ApiAccordion({ translator }) {
     <Accordion expanded={expanded} onChange={handleChange}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>
-          {api.apiName
-            ? `${translator} (${api.apiName})`
-            : translator}
+          {api.apiName ? `${translator} (${api.apiName})` : translator}
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
@@ -479,33 +487,26 @@ function ApiAccordion({ translator }) {
 function ApiAccordionWithRemove({ translator, baseType, onRemove }) {
   const [expanded, setExpanded] = useState(false);
   const { api, updateApi, resetApi } = useApi(translator);
+  const alert = useAlert();
+  const i18n = useI18n();
 
   const handleChange = (e) => {
     setExpanded((pre) => !pre);
   };
 
+  const handleRemove = () => {
+    if (window.confirm(i18n("confirm_remove_api"))) {
+      onRemove(translator);
+      alert.success(i18n("api_removed_successfully"));
+    }
+  };
+
   return (
     <Accordion expanded={expanded} onChange={handleChange}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          width="100%"
-        >
-          <Typography>
-            {api.apiName ? `${baseType} (${api.apiName})` : baseType}
-          </Typography>
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove(translator);
-            }}
-          >
-            <RemoveIcon />
-          </IconButton>
-        </Stack>
+        <Typography>
+          {api.apiName ? `${baseType} (${api.apiName})` : baseType}
+        </Typography>
       </AccordionSummary>
       <AccordionDetails>
         {expanded && (
@@ -514,6 +515,7 @@ function ApiAccordionWithRemove({ translator, baseType, onRemove }) {
             api={api}
             updateApi={updateApi}
             resetApi={resetApi}
+            onRemove={handleRemove}
           />
         )}
       </AccordionDetails>

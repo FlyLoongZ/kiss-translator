@@ -1248,4 +1248,19 @@ export const I18N = {
     en: `Added APIs`,
     zh_TW: `已新增的 API`,
   },
+  confirm_remove_api: {
+    zh: `确定要删除此API吗？此操作不可撤销。`,
+    en: `Are you sure you want to delete this API? This action cannot be undone.`,
+    zh_TW: `確定要刪除此API嗎？此操作不可撤銷。`,
+  },
+  api_removed_successfully: {
+    zh: `API已成功删除`,
+    en: `API removed successfully`,
+    zh_TW: `API已成功刪除`,
+  },
+  remove: {
+    zh: `删除`,
+    en: `Remove`,
+    zh_TW: `刪除`,
+  },
 };
