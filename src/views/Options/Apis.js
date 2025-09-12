@@ -557,12 +557,15 @@ export default function Apis() {
 
       // 初始化新API的配置
       const defaultConfig = setting?.transApis?.[selectedApi] || {};
+      // 计算相同类型API的数量，用于命名
+      const sameTypeCount =
+        addedApis.filter((api) => api.startsWith(selectedApi)).length + 1;
       updateSetting({
         transApis: {
           ...setting?.transApis,
           [newApiId]: {
             ...defaultConfig,
-            apiName: `${selectedApi} ${addedApis.filter((api) => api.startsWith(selectedApi)).length + 1}`,
+            apiName: `${selectedApi} ${sameTypeCount}`,
           },
         },
       });
@@ -587,11 +590,8 @@ export default function Apis() {
 
   // 获取未添加的API列表
   const getUnaddedApis = () => {
-    // 获取已添加的API类型（去除时间戳）
-    const addedApiTypes = addedApis.map((api) => api.replace(/_\d+$/, ""));
-    return availableApis.filter(
-      (translator) => !addedApiTypes.includes(translator)
-    );
+    // 允许无限添加相同类型的API，所以返回所有可用的API
+    return availableApis;
   };
 
   return (
