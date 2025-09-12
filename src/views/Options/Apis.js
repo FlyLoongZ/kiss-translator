@@ -6,7 +6,6 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import {
-  OPT_TRANS_ALL,
   OPT_TRANS_GOOGLE,
   OPT_TRANS_GOOGLE_2,
   OPT_TRANS_MICROSOFT,
@@ -536,9 +535,18 @@ export default function Apis() {
     OPT_TRANS_VOLCENGINE,
   ];
 
-  const availableApis = OPT_TRANS_ALL.filter(
-    (translator) => !builtinTranslators.includes(translator)
-  );
+  const availableApis = [
+    OPT_TRANS_DEEPL,
+    OPT_TRANS_DEEPLX,
+    OPT_TRANS_NIUTRANS,
+    OPT_TRANS_OPENAI,
+    OPT_TRANS_GEMINI,
+    OPT_TRANS_CLAUDE,
+    OPT_TRANS_CLOUDFLAREAI,
+    OPT_TRANS_OLLAMA,
+    OPT_TRANS_OPENROUTER,
+    OPT_TRANS_CUSTOMIZE,
+  ];
 
   // 初始化已添加的API列表
   useEffect(() => {

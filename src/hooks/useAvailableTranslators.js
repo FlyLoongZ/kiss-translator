@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useSetting } from "./Setting";
 import {
-  OPT_TRANS_ALL,
   OPT_TRANS_GOOGLE,
   OPT_TRANS_GOOGLE_2,
   OPT_TRANS_MICROSOFT,

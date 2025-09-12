@@ -19,12 +19,12 @@ import {
   MSG_OPEN_OPTIONS,
   MSG_SAVE_RULE,
   MSG_COMMAND_SHORTCUTS,
-  OPT_TRANS_ALL,
   OPT_LANGS_FROM,
   OPT_LANGS_TO,
   OPT_STYLE_ALL,
   DEFAULT_TRANS_APIS,
 } from "../../config";
+import { useAvailableTranslators } from "../../hooks/useAvailableTranslators";
 import { sendIframeMsg } from "../../libs/iframe";
 import { saveRule } from "../../libs/rules";
 import { tryClearCaches } from "../../libs";
@@ -141,18 +141,21 @@ export default function Popup({ setShowPopup, translator: tran }) {
     })();
   }, [tran]);
 
+  const { translators, getDisplayName } = useAvailableTranslators();
+
   const optApis = useMemo(
     () =>
-      OPT_TRANS_ALL.map((key) => ({
-        ...(transApis[key] || DEFAULT_TRANS_APIS[key]),
-        apiKey: key,
-      }))
+      translators
+        .map((key) => ({
+          ...(transApis[key] || DEFAULT_TRANS_APIS[key]),
+          apiKey: key,
+        }))
         .filter((item) => !item.isDisabled)
         .map(({ apiKey, apiName }) => ({
           key: apiKey,
-          name: apiName?.trim() || apiKey,
+          name: getDisplayName(apiKey),
         })),
-    [transApis]
+    [transApis, translators, getDisplayName]
   );
 
   if (!rule) {
