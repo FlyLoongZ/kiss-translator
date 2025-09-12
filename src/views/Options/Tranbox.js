@@ -4,7 +4,6 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { useI18n } from "../../hooks/I18n";
 import {
-  OPT_TRANS_ALL,
   OPT_LANGS_FROM,
   OPT_LANGS_TO,
   OPT_TRANBOX_TRIGGER_CLICK,
@@ -16,10 +15,12 @@ import { useCallback } from "react";
 import { limitNumber } from "../../libs/utils";
 import { useTranbox } from "../../hooks/Tranbox";
 import { isExt } from "../../libs/client";
+import { useAvailableTranslators } from "../../hooks/useAvailableTranslators";
 
 export default function Tranbox() {
   const i18n = useI18n();
   const { tranboxSetting, updateTranbox } = useTranbox();
+  const { translators, getDisplayName } = useAvailableTranslators();
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -75,9 +76,9 @@ export default function Tranbox() {
           label={i18n("translate_service")}
           onChange={handleChange}
         >
-          {OPT_TRANS_ALL.map((item) => (
+          {translators.map((item) => (
             <MenuItem key={item} value={item}>
-              {item}
+              {getDisplayName(item)}
             </MenuItem>
           ))}
         </TextField>

@@ -4,7 +4,6 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { useI18n } from "../../hooks/I18n";
 import {
-  OPT_TRANS_ALL,
   OPT_LANGS_FROM,
   OPT_LANGS_TO,
   OPT_INPUT_TRANS_SIGNS,
@@ -16,10 +15,12 @@ import { useInputRule } from "../../hooks/InputRule";
 import { useCallback } from "react";
 import Grid from "@mui/material/Grid";
 import { limitNumber } from "../../libs/utils";
+import { useAvailableTranslators } from "../../hooks/useAvailableTranslators";
 
 export default function InputSetting() {
   const i18n = useI18n();
   const { inputRule, updateInputRule } = useInputRule();
+  const { translators, getDisplayName } = useAvailableTranslators();
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -78,9 +79,9 @@ export default function InputSetting() {
           label={i18n("translate_service")}
           onChange={handleChange}
         >
-          {OPT_TRANS_ALL.map((item) => (
+          {translators.map((item) => (
             <MenuItem key={item} value={item}>
-              {item}
+              {getDisplayName(item)}
             </MenuItem>
           ))}
         </TextField>

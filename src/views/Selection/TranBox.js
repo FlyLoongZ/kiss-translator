@@ -18,12 +18,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import CloseIcon from "@mui/icons-material/Close";
 import { useI18n } from "../../hooks/I18n";
-import {
-  OPT_TRANS_ALL,
-  OPT_LANGS_FROM,
-  OPT_LANGS_TO,
-  DEFAULT_TRANS_APIS,
-} from "../../config";
+import { OPT_LANGS_FROM, OPT_LANGS_TO, DEFAULT_TRANS_APIS } from "../../config";
 import { useState, useRef, useMemo } from "react";
 import TranCont from "./TranCont";
 import DictCont from "./DictCont";
@@ -31,6 +26,7 @@ import SugCont from "./SugCont";
 import CopyBtn from "./CopyBtn";
 import { isValidWord } from "../../libs/utils";
 import { isMobile } from "../../libs/mobile";
+import { useAvailableTranslators } from "../../hooks/useAvailableTranslators";
 
 function Header({
   setShowPopup,
@@ -116,6 +112,7 @@ function TranForm({
   enDict,
 }) {
   const i18n = useI18n();
+  const { translators, getDisplayName } = useAvailableTranslators();
 
   const [editMode, setEditMode] = useState(false);
   const [editText, setEditText] = useState("");
@@ -126,16 +123,17 @@ function TranForm({
 
   const optApis = useMemo(
     () =>
-      OPT_TRANS_ALL.map((key) => ({
-        ...(transApis[key] || DEFAULT_TRANS_APIS[key]),
-        apiKey: key,
-      }))
+      translators
+        .map((key) => ({
+          ...(transApis[key] || DEFAULT_TRANS_APIS[key]),
+          apiKey: key,
+        }))
         .filter((item) => !item.isDisabled)
         .map(({ apiKey, apiName }) => ({
           key: apiKey,
-          name: apiName?.trim() || apiKey,
+          name: getDisplayName(apiKey),
         })),
-    [transApis]
+    [transApis, translators, getDisplayName]
   );
 
   return (

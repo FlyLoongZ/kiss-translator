@@ -10,7 +10,6 @@ import {
   GLOBLA_RULE,
   OPT_LANGS_FROM,
   OPT_LANGS_TO,
-  OPT_TRANS_ALL,
   OPT_STYLE_ALL,
   OPT_STYLE_DIY,
   OPT_STYLE_USE_COLOR,
@@ -61,6 +60,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SaveIcon from "@mui/icons-material/Save";
 import { kissLog } from "../../libs/log";
+import { useAvailableTranslators } from "../../hooks/useAvailableTranslators";
 
 function RuleFields({ rule, rules, setShow, setKeyword }) {
   const initFormValues = {
@@ -74,6 +74,7 @@ function RuleFields({ rule, rules, setShow, setKeyword }) {
   const [errors, setErrors] = useState({});
   const [formValues, setFormValues] = useState(initFormValues);
   const [showMore, setShowMore] = useState(!rules);
+  const { translators, getDisplayName } = useAvailableTranslators();
   const {
     pattern,
     selector,
@@ -282,9 +283,9 @@ function RuleFields({ rule, rules, setShow, setKeyword }) {
                 onChange={handleChange}
               >
                 {GlobalItem}
-                {OPT_TRANS_ALL.map((item) => (
+                {translators.map((item) => (
                   <MenuItem key={item} value={item}>
-                    {item}
+                    {getDisplayName(item)}
                   </MenuItem>
                 ))}
               </TextField>

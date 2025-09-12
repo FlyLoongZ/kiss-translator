@@ -6,7 +6,6 @@ import {
   REMAIN_KEY,
   OPT_LANGS_FROM,
   OPT_LANGS_TO,
-  OPT_TRANS_ALL,
   OPT_STYLE_ALL,
   OPT_STYLE_DIY,
   OPT_STYLE_USE_COLOR,
@@ -15,10 +14,12 @@ import { useI18n } from "../../hooks/I18n";
 import MenuItem from "@mui/material/MenuItem";
 import Grid from "@mui/material/Grid";
 import { useOwSubRule } from "../../hooks/SubRules";
+import { useAvailableTranslators } from "../../hooks/useAvailableTranslators";
 
 export default function OwSubRule() {
   const i18n = useI18n();
   const { owSubrule, updateOwSubrule } = useOwSubRule();
+  const { translators, getDisplayName } = useAvailableTranslators();
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -80,9 +81,9 @@ export default function OwSubRule() {
             >
               {RemainItem}
               {GlobalItem}
-              {OPT_TRANS_ALL.map((item) => (
+              {translators.map((item) => (
                 <MenuItem key={item} value={item}>
-                  {item}
+                  {getDisplayName(item)}
                 </MenuItem>
               ))}
             </TextField>
