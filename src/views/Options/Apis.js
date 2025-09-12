@@ -605,10 +605,10 @@ export default function Apis() {
       <Stack spacing={3}>
         <Alert severity="info">{i18n("about_api")}</Alert>
 
-        {/* 内置翻译器 */}
+        {/* 内置翻译API */}
         <Box>
           <Typography variant="h6" gutterBottom>
-            {i18n("builtin_translators")}
+            {i18n("builtin_translation_api")}
           </Typography>
           {builtinTranslators.map((translator) => (
             <ApiAccordion key={translator} translator={translator} />
@@ -628,7 +628,6 @@ export default function Apis() {
                 label={i18n("select_api")}
                 onChange={(e) => setSelectedApi(e.target.value)}
               >
-                <MenuItem value="">{i18n("add_translation_api")}</MenuItem>
                 {getUnaddedApis().map((translator) => (
                   <MenuItem key={translator} value={translator}>
                     {translator}

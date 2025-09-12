@@ -1228,28 +1228,23 @@ export const I18N = {
     en: `If translate selected`,
     zh_TW: `是否啟用劃詞翻譯`,
   },
-  add_translation_api: {
-    zh: `添加翻译接口`,
-    en: `Add Translation API`,
-    zh_TW: `新增翻譯介面`,
-  },
   select_api: {
     zh: `选择接口`,
     en: `Select API`,
     zh_TW: `選擇介面`,
   },
-  builtin_translators: {
-    zh: `内置翻译器`,
-    en: `Built-in Translators`,
-    zh_TW: `內建翻譯器`,
+  builtin_translation_api: {
+    zh: `内置翻译 API`,
+    en: `Built-in translation API`,
+    zh_TW: `內建翻譯 API`,
   },
   add_other_apis: {
-    zh: `添加其他API`,
+    zh: `添加其他 API`,
     en: `Add Other APIs`,
     zh_TW: `新增其他 API`,
   },
   added_apis: {
-    zh: `已添加的API`,
+    zh: `已添加的 API`,
     en: `Added APIs`,
     zh_TW: `已新增的 API`,
   },
