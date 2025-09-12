@@ -7,6 +7,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import {
   OPT_TRANS_ALL,
+  OPT_TRANS_GOOGLE,
+  OPT_TRANS_GOOGLE_2,
   OPT_TRANS_MICROSOFT,
   OPT_TRANS_DEEPL,
   OPT_TRANS_DEEPLX,
@@ -168,6 +170,8 @@ function ApiFields({ translator, api, updateApi, resetApi }) {
   };
 
   const builtinTranslators = [
+    OPT_TRANS_GOOGLE,
+    OPT_TRANS_GOOGLE_2,
     OPT_TRANS_MICROSOFT,
     OPT_TRANS_DEEPLFREE,
     OPT_TRANS_BAIDU,
@@ -523,6 +527,8 @@ export default function Apis() {
   const [addedApis, setAddedApis] = useState([]);
 
   const builtinTranslators = [
+    OPT_TRANS_GOOGLE,
+    OPT_TRANS_GOOGLE_2,
     OPT_TRANS_MICROSOFT,
     OPT_TRANS_DEEPLFREE,
     OPT_TRANS_BAIDU,
