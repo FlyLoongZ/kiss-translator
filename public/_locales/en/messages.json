@@ -16,5 +16,17 @@
   },
   "open_tranbox": {
     "message": "Translate Popup/Selected"
+  },
+  "builtin_translators": {
+    "message": "Built-in Translators"
+  },
+  "add_other_apis": {
+    "message": "Add Other APIs"
+  },
+  "select_api": {
+    "message": "Select API"
+  },
+  "added_apis": {
+    "message": "Added APIs"
   }
 }

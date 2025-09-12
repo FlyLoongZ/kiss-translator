@@ -16,5 +16,17 @@
   },
   "open_tranbox": {
     "message": "翻译弹窗/选中文字"
+  },
+  "builtin_translators": {
+    "message": "内置翻译器"
+  },
+  "add_other_apis": {
+    "message": "添加其他API"
+  },
+  "select_api": {
+    "message": "选择API"
+  },
+  "added_apis": {
+    "message": "已添加的API"
   }
 }

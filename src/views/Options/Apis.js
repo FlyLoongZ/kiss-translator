@@ -36,8 +36,9 @@ import {
   DEFAULT_FETCH_INTERVAL,
   DEFAULT_HTTP_TIMEOUT,
 } from "../../config";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useI18n } from "../../hooks/I18n";
+import { useSetting } from "../../hooks/Setting";
 import Typography from "@mui/material/Typography";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -50,6 +51,13 @@ import { apiTranslate } from "../../apis";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import { limitNumber, limitFloat } from "../../libs/utils";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 function TestButton({ translator, api }) {
   const i18n = useI18n();
@@ -482,18 +490,157 @@ function ApiAccordion({ translator }) {
   );
 }
 
+function ApiAccordionWithRemove({ translator, onRemove }) {
+  const [expanded, setExpanded] = useState(false);
+  const { api, updateApi, resetApi } = useApi(translator);
+
+  const handleChange = (e) => {
+    setExpanded((pre) => !pre);
+  };
+
+  return (
+    <Accordion expanded={expanded} onChange={handleChange}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          width="100%"
+        >
+          <Typography>
+            {api.apiName ? `${translator} (${api.apiName})` : translator}
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(translator);
+            }}
+          >
+            <RemoveIcon />
+          </IconButton>
+        </Stack>
+      </AccordionSummary>
+      <AccordionDetails>
+        {expanded && (
+          <ApiFields
+            translator={translator}
+            api={api}
+            updateApi={updateApi}
+            resetApi={resetApi}
+          />
+        )}
+      </AccordionDetails>
+    </Accordion>
+  );
+}
+
 export default function Apis() {
   const i18n = useI18n();
+  const { setting, updateSetting } = useSetting();
+  const [selectedApi, setSelectedApi] = useState("");
+  const [addedApis, setAddedApis] = useState([]);
+
+  const builtinTranslators = [
+    OPT_TRANS_MICROSOFT,
+    OPT_TRANS_DEEPLFREE,
+    OPT_TRANS_BAIDU,
+    OPT_TRANS_TENCENT,
+    OPT_TRANS_VOLCENGINE,
+  ];
+
+  const availableApis = OPT_TRANS_ALL.filter(
+    (translator) => !builtinTranslators.includes(translator)
+  );
+
+  // 初始化已添加的API列表
+  useEffect(() => {
+    const transApis = setting?.transApis || {};
+    const configuredApis = Object.keys(transApis).filter(
+      (translator) =>
+        !builtinTranslators.includes(translator) &&
+        (transApis[translator].url ||
+          transApis[translator].key ||
+          transApis[translator].apiName)
+    );
+    setAddedApis(configuredApis);
+  }, [setting]);
+
+  const handleAddApi = () => {
+    if (selectedApi && !addedApis.includes(selectedApi)) {
+      setAddedApis([...addedApis, selectedApi]);
+      setSelectedApi("");
+    }
+  };
+
+  const handleRemoveApi = (translator) => {
+    setAddedApis(addedApis.filter((api) => api !== translator));
+  };
+
   return (
     <Box>
       <Stack spacing={3}>
         <Alert severity="info">{i18n("about_api")}</Alert>
 
+        {/* 内置翻译器 */}
         <Box>
-          {OPT_TRANS_ALL.map((translator) => (
+          <Typography variant="h6" gutterBottom>
+            {i18n("builtin_translators")}
+          </Typography>
+          {builtinTranslators.map((translator) => (
             <ApiAccordion key={translator} translator={translator} />
           ))}
         </Box>
+
+        {/* 添加其他API */}
+        <Box>
+          <Typography variant="h6" gutterBottom>
+            {i18n("add_other_apis")}
+          </Typography>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <FormControl size="small" fullWidth>
+              <InputLabel>{i18n("select_api")}</InputLabel>
+              <Select
+                value={selectedApi}
+                label={i18n("select_api")}
+                onChange={(e) => setSelectedApi(e.target.value)}
+              >
+                {availableApis
+                  .filter((api) => !addedApis.includes(api))
+                  .map((translator) => (
+                    <MenuItem key={translator} value={translator}>
+                      {translator}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+            <IconButton
+              color="primary"
+              onClick={handleAddApi}
+              disabled={!selectedApi}
+            >
+              <AddIcon />
+            </IconButton>
+          </Stack>
+        </Box>
+
+        {/* 已添加的API */}
+        {addedApis.length > 0 && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              {i18n("added_apis")}
+            </Typography>
+            <Stack spacing={1}>
+              {addedApis.map((translator) => (
+                <ApiAccordionWithRemove
+                  key={translator}
+                  translator={translator}
+                  onRemove={handleRemoveApi}
+                />
+              ))}
+            </Stack>
+          </Box>
+        )}
       </Stack>
     </Box>
   );
