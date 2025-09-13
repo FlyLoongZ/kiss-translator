@@ -28,7 +28,7 @@ import {
   DEFAULT_FETCH_INTERVAL,
   DEFAULT_HTTP_TIMEOUT,
 } from "../../config";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useI18n } from "../../hooks/I18n";
 import { useSetting } from "../../hooks/Setting";
 import Typography from "@mui/material/Typography";
@@ -46,10 +46,8 @@ import { limitNumber, limitFloat } from "../../libs/utils";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
-import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
 
 function TestButton({ translator, api }) {
   const i18n = useI18n();
@@ -529,15 +527,18 @@ export default function Apis() {
   const [selectedApi, setSelectedApi] = useState("");
   const [addedApis, setAddedApis] = useState([]);
 
-  const builtinTranslators = [
-    OPT_TRANS_GOOGLE,
-    OPT_TRANS_GOOGLE_2,
-    OPT_TRANS_MICROSOFT,
-    OPT_TRANS_DEEPLFREE,
-    OPT_TRANS_BAIDU,
-    OPT_TRANS_TENCENT,
-    OPT_TRANS_VOLCENGINE,
-  ];
+  const builtinTranslators = useMemo(
+    () => [
+      OPT_TRANS_GOOGLE,
+      OPT_TRANS_GOOGLE_2,
+      OPT_TRANS_MICROSOFT,
+      OPT_TRANS_DEEPLFREE,
+      OPT_TRANS_BAIDU,
+      OPT_TRANS_TENCENT,
+      OPT_TRANS_VOLCENGINE,
+    ],
+    []
+  );
 
   const availableApis = [
     OPT_TRANS_DEEPL,
@@ -565,7 +566,7 @@ export default function Apis() {
           transApis[translator].apiName)
     );
     setAddedApis(configuredApis);
-  }, [setting]);
+  }, [setting, builtinTranslators]);
 
   const handleAddApi = () => {
     if (selectedApi) {
